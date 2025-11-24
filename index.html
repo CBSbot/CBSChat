@@ -822,8 +822,9 @@
           throw new Error("HTTP " + res.status);
         }
 
-        const data = await res.json();
-        const reply = data.reply || "No reply field in response.";
+        const data = await res.json(); 
+        console.log("Webhook response:", data);
+        const reply = data.output || "No reply field in response.";
         hideTypingIndicator();
         addMessage("bot", reply);
         speakText(reply);
