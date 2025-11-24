@@ -824,7 +824,21 @@
 
         const data = await res.json(); 
         console.log("Webhook response:", data);
-        const reply = data.output || "No reply field in response.";
+        
+        let reply;
+
+        // handle different possible shapes safely
+        if (Array.isArray(data)) {
+        reply = data[0]?.reply || data[0]?.json?.reply;
+        } else if (data && typeof data === "object") {
+        reply = data.reply || data.json?.reply;
+        }
+
+        if (!reply) {
+        reply = "No reply field in response.";
+        }
+
+
         hideTypingIndicator();
         addMessage("bot", reply);
         speakText(reply);
