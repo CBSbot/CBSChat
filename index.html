@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your Brand – AI Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --brand-primary: #2563eb;
+      --brand-primary-dark: #1d4ed8;
+      --brand-bg: #0f172a;
+      --brand-accent: #facc15;
+      --chat-bg: #f9fafb;
+      --chat-border: #e5e7eb;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --radius-lg: 16px;
+      --shadow-lg: 0 18px 45px rgba(15, 23, 42, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: #0b1120;
+      color: #e5e7eb;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .branding-hero {
+      max-width: 720px;
+      text-align: center;
+    }
+
+    .branding-title {
+      font-size: clamp(1.8rem, 3vw, 2.3rem);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .branding-subtitle {
+      font-size: 0.95rem;
+      color: #9ca3af;
+      margin-bottom: 12px;
+    }
+
+    .branding-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 0.75rem;
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+    }
+
+    .branding-pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    /* Floating Chat Button */
+    #chat-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--brand-primary), #ec4899);
+      color: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.45);
+      cursor: pointer;
+      font-size: 24px;
+      z-index: 9999;
+    }
+
+    #chat-toggle-icon {
+      transition: transform 0.2s ease;
+    }
+
+    #chat-toggle.open #chat-toggle-icon {
+      transform: rotate(45deg);
+    }
+
+    /* Chat Widget Container */
+    #chat-widget {
+      position: fixed;
+      bottom: 90px;
+      right: 24px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      height: 520px;
+      background: #020617;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform-origin: bottom right;
+      transform: scale(0.9);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 9998;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    #chat-widget.open {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    /* Header */
+    .chat-header {
+      padding: 10px 12px;
+      background: radial-gradient(circle at top left, #1f2937, #020617);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .chat-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, var(--brand-accent), var(--brand-primary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #020617;
+      box-shadow: 0 0 0 2px #020617;
+    }
+
+    .chat-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #e5e7eb;
+      line-height: 1.2;
+    }
+
+    .chat-subtitle {
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+
+    .chat-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .select-lang {
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 0.72rem;
+      padding: 3px 18px 3px 8px;
+      outline: none;
+      appearance: none;
+      position: relative;
+    }
+
+    .select-lang-wrapper {
+      position: relative;
+    }
+
+    .select-lang-wrapper::after {
+      content: "▾";
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.6rem;
+      color: #9ca3af;
+      pointer-events: none;
+    }
+
+    .header-icon-btn {
+      border: none;
+      background: transparent;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px;
+    }
+
+    /* Messages Area */
+    .chat-messages {
+      flex: 1;
+      background: radial-gradient(circle at top, #020617, #020617 40%, #020617);
+      padding: 10px 10px 4px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .chat-messages-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .chat-message-row {
+      display: flex;
+    }
+
+    .chat-message-row.user {
+      justify-content: flex-end;
+    }
+
+    .chat-message {
+      max-width: 80%;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      border-radius: 14px;
+      word-wrap: break-word;
+      backdrop-filter: blur(6px);
+    }
+
+    .chat-message.bot {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: #e5e7eb;
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-message.user {
+      background: linear-gradient(135deg, var(--brand-primary), #ec4899);
+      color: #f9fafb;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-meta {
+      font-size: 0.65rem;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .chat-meta-right {
+      text-align: right;
+    }
+
+    /* Quick prompts */
+    .quick-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 4px 2px 6px;
+      margin-top: 4px;
+    }
+
+    .quick-prompt-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.7);
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      color: #e5e7eb;
+      cursor: pointer;
+    }
+
+    .quick-prompt-btn:hover {
+      border-color: var(--brand-primary);
+    }
+
+    /* Typing indicator */
+    .typing-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .typing-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .typing-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: #9ca3af;
+      animation: bounce 1s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+      40% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 2px solid rgba(148, 163, 184, 0.4);
+      border-top-color: var(--brand-accent);
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .chat-footer {
+      border-top: 1px solid rgba(148, 163, 184, 0.3);
+      background: #020617;
+      padding: 6px 8px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: #6b7280;
+      padding: 0 2px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.7);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(75, 85, 99, 0.8);
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    .chat-input::placeholder {
+      color: #6b7280;
+    }
+
+    .icon-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      background: #020617;
+      color: #e5e7eb;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .icon-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .send-btn {
+      width: 64px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--brand-primary), #ec4899);
+      color: #f9fafb;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 10px;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 480px) {
+      #chat-widget {
+        right: 50%;
+        transform: translateX(50%) scale(0.9);
+      }
+      #chat-widget.open {
+        transform: translateX(50%) scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="branding-hero">
+    <div class="branding-pill">
+      <span class="branding-pill-dot"></span>
+      <span>AI Copilot connected to your knowledge base</span>
+    </div>
+    <h1 class="branding-title">Your Brand AI Assistant</h1>
+    <p class="branding-subtitle">
+      Ask questions in English or Japanese. Your answers are powered by your private knowledge base.
+    </p>
+  </div>
+
+  <!-- Floating Toggle Button -->
+  <button id="chat-toggle" aria-label="Open chat">
+    <span id="chat-toggle-icon">💬</span>
+  </button>
+
+  <!-- Chat Widget -->
+  <div id="chat-widget" aria-live="polite">
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <div class="chat-avatar">AI</div>
+        <div>
+          <div class="chat-title">Your Brand Assistant</div>
+          <div class="chat-subtitle" id="chat-subtitle">
+            Answers from your internal documents.
+          </div>
+        </div>
+      </div>
+      <div class="chat-header-right">
+        <div class="select-lang-wrapper">
+          <select id="lang-select" class="select-lang">
+            <option value="en">EN 🇬🇧</option>
+            <option value="ja">JA 🇯🇵</option>
+          </select>
+        </div>
+        <button class="header-icon-btn" id="header-info-btn" title="Info">ℹ️</button>
+        <button class="header-icon-btn" id="header-minimize-btn" title="Close">✕</button>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-messages-inner" id="chat-messages-inner">
+        <!-- Messages will be injected here -->
+      </div>
+    </div>
+
+    <div class="chat-footer">
+      <div class="quick-prompts" id="quick-prompts">
+        <button class="quick-prompt-btn" data-prompt-en="What can you do?"
+          data-prompt-ja="あなたは何ができますか？">
+          ⭐ What can you do?
+        </button>
+        <button class="quick-prompt-btn"
+          data-prompt-en="Summarize the latest update in the knowledge base."
+          data-prompt-ja="ナレッジベースの最新更新を要約してください。">
+          📚 Latest update
+        </button>
+        <button class="quick-prompt-btn"
+          data-prompt-en="Explain how to use this chatbot."
+          data-prompt-ja="このチャットボットの使い方を説明してください。">
+          ❓ How to use
+        </button>
+      </div>
+
+      <div class="status-row">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span id="status-text">Online</span>
+        </div>
+        <span id="session-label">Session: …</span>
+      </div>
+
+      <div class="input-row">
+        <input
+          id="user-input"
+          class="chat-input"
+          type="text"
+          placeholder="Type your message…"
+          autocomplete="off"
+        />
+        <button id="mic-btn" class="icon-btn" title="Voice input">
+          🎙️
+        </button>
+        <button id="send-btn" class="send-btn">
+          <span id="send-btn-label">Send</span>
+          <span id="send-btn-spinner" class="spinner" style="display:none;"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /***********************
+     * CONFIG
+     ***********************/
+    const WEBHOOK_URL = "YOUR_WEBHOOK_URL_HERE"; // <-- set your n8n webhook URL
+    const AUTH_TOKEN = "YOUR_SECRET_TOKEN_HERE"; // <-- or "" if not needed
+
+    /***********************
+     * SESSION & STORAGE
+     ***********************/
+    function getOrCreateSessionId() {
+      const key = "kb_chat_session_id";
+      let id = localStorage.getItem(key);
+      if (!id) {
+        if (window.crypto?.randomUUID) {
+          id = "sess_" + crypto.randomUUID();
+        } else {
+          id = "sess_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2);
+        }
+        localStorage.setItem(key, id);
+      }
+      return id;
+    }
+
+    const sessionId = getOrCreateSessionId();
+    const historyKey = "kb_chat_history_" + sessionId;
+
+    function loadHistory() {
+      try {
+        const raw = localStorage.getItem(historyKey);
+        if (!raw) return [];
+        return JSON.parse(raw) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveHistory(history) {
+      localStorage.setItem(historyKey, JSON.stringify(history));
+    }
+
+    /***********************
+     * ELEMENTS
+     ***********************/
+    const chatToggle = document.getElementById("chat-toggle");
+    const chatWidget = document.getElementById("chat-widget");
+    const chatToggleIcon = document.getElementById("chat-toggle-icon");
+
+    const messagesInner = document.getElementById("chat-messages-inner");
+    const messagesScroll = document.getElementById("chat-messages");
+    const statusText = document.getElementById("status-text");
+    const sessionLabel = document.getElementById("session-label");
+    const langSelect = document.getElementById("lang-select");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    const sendBtnLabel = document.getElementById("send-btn-label");
+    const sendBtnSpinner = document.getElementById("send-btn-spinner");
+    const micBtn = document.getElementById("mic-btn");
+    const headerMinimizeBtn = document.getElementById("header-minimize-btn");
+    const headerInfoBtn = document.getElementById("header-info-btn");
+    const quickPrompts = document.getElementById("quick-prompts");
+    const chatSubtitle = document.getElementById("chat-subtitle");
+
+    sessionLabel.textContent = "Session: " + sessionId.slice(-6);
+
+    /***********************
+     * LANGUAGE STRINGS
+     ***********************/
+    const strings = {
+      en: {
+        welcome:
+          "👋 Hi! I’m your AI assistant. Ask me anything about your documents or knowledge base.",
+        placeholder: "Type your message…",
+        sending: "Thinking…",
+        online: "Online",
+        error: "Error – please try again.",
+        howToUse:
+          "You can ask questions in English or Japanese. I use your private knowledge base behind the scenes.",
+        subtitle: "Answers from your internal documents.",
+      },
+      ja: {
+        welcome:
+          "👋 こんにちは。AIアシスタントです。ナレッジベースや資料について何でも聞いてください。",
+        placeholder: "メッセージを入力してください…",
+        sending: "考えています…",
+        online: "オンライン",
+        error: "エラーが発生しました。もう一度お試しください。",
+        howToUse:
+          "英語と日本語で質問できます。社内ナレッジベースの情報をもとに回答します。",
+        subtitle: "社内ナレッジベースから回答します。",
+      },
+    };
+
+    function getLang() {
+      return langSelect.value || "en";
+    }
+
+    function applyLang() {
+      const lang = getLang();
+      userInput.placeholder = strings[lang].placeholder;
+      chatSubtitle.textContent = strings[lang].subtitle;
+      // Update quick prompt labels by re-rendering? (we used static EN labels,
+      // but the data-prompt-ja is used when sending, so OK)
+    }
+
+    /***********************
+     * MESSAGE RENDERING
+     ***********************/
+    let history = loadHistory();
+
+    function appendMessageToDom(msg) {
+      const row = document.createElement("div");
+      row.className = "chat-message-row " + (msg.sender === "user" ? "user" : "bot");
+
+      const bubble = document.createElement("div");
+      bubble.className = "chat-message " + msg.sender;
+      bubble.textContent = msg.text;
+
+      row.appendChild(bubble);
+
+      const meta = document.createElement("div");
+      meta.className = "chat-meta " + (msg.sender === "user" ? "chat-meta-right" : "");
+      meta.textContent = msg.timestamp || "";
+
+      messagesInner.appendChild(row);
+      if (msg.timestamp) messagesInner.appendChild(meta);
+
+      messagesScroll.scrollTop = messagesScroll.scrollHeight;
+    }
+
+    function renderHistory() {
+      messagesInner.innerHTML = "";
+      history.forEach(appendMessageToDom);
+    }
+
+    function addMessage(sender, text) {
+      const ts = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const msg = { sender, text, timestamp: ts };
+      history.push(msg);
+      saveHistory(history);
+      appendMessageToDom(msg);
+    }
+
+    /***********************
+     * TYPING INDICATOR
+     ***********************/
+    let typingRow = null;
+
+    function showTypingIndicator() {
+      if (typingRow) return;
+      typingRow = document.createElement("div");
+      typingRow.className = "typing-row";
+      typingRow.innerHTML =
+        '<div class="chat-message bot">' +
+        '<span class="typing-dots">' +
+        '<span class="typing-dot"></span>' +
+        '<span class="typing-dot"></span>' +
+        '<span class="typing-dot"></span>' +
+        "</span>" +
+        "</div>";
+      messagesInner.appendChild(typingRow);
+      messagesScroll.scrollTop = messagesScroll.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+      if (typingRow && typingRow.parentNode) {
+        typingRow.parentNode.removeChild(typingRow);
+      }
+      typingRow = null;
+    }
+
+    /***********************
+     * VOICE INPUT & TTS
+     ***********************/
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let recognizing = false;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        userInput.value = transcript;
+      };
+
+      recognition.onend = () => {
+        recognizing = false;
+        micBtn.textContent = "🎙️";
+      };
+
+      recognition.onerror = () => {
+        recognizing = false;
+        micBtn.textContent = "🎙️";
+        // optional: show a small error
+      };
+    } else {
+      micBtn.disabled = true;
+      micBtn.title = "Voice input not supported in this browser.";
+    }
+
+    function startVoiceInput() {
+      if (!recognition) return;
+      const lang = getLang();
+      recognition.lang = lang === "ja" ? "ja-JP" : "en-US";
+      recognizing = true;
+      micBtn.textContent = "⏹️";
+      recognition.start();
+    }
+
+    function stopVoiceInput() {
+      if (!recognition) return;
+      recognition.stop();
+      recognizing = false;
+      micBtn.textContent = "🎙️";
+    }
+
+    function speakText(text) {
+      if (!("speechSynthesis" in window)) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      const lang = getLang();
+      utter.lang = lang === "ja" ? "ja-JP" : "en-US";
+      window.speechSynthesis.speak(utter);
+    }
+
+    /***********************
+     * SENDING LOGIC
+     ***********************/
+    let sending = false;
+
+    async function sendMessage() {
+      if (sending) return;
+      const text = userInput.value.trim();
+      if (!text) return;
+
+      const lang = getLang();
+
+      // Add user message
+      addMessage("user", text);
+      userInput.value = "";
+      messagesScroll.scrollTop = messagesScroll.scrollHeight;
+
+      sending = true;
+      sendBtn.disabled = true;
+      micBtn.disabled = true;
+      sendBtnLabel.textContent = "";
+      sendBtnSpinner.style.display = "inline-block";
+      statusText.textContent = strings[lang].sending;
+
+      showTypingIndicator();
+
+      try {
+        const payload = {
+          message: text,
+          language: lang,
+          sessionId: sessionId,
+        };
+
+        const headers = {
+          "Content-Type": "application/json",
+        };
+        if (AUTH_TOKEN) {
+          headers["Authorization"] = "Bearer " + AUTH_TOKEN;
+        }
+
+        const res = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+
+        const data = await res.json();
+        const reply = data.reply || "No reply field in response.";
+        hideTypingIndicator();
+        addMessage("bot", reply);
+        speakText(reply);
+        statusText.textContent = strings[lang].online;
+      } catch (err) {
+        console.error(err);
+        hideTypingIndicator();
+        addMessage("bot", strings[getLang()].error);
+        statusText.textContent = strings[getLang()].error;
+      } finally {
+        sending = false;
+        sendBtn.disabled = false;
+        micBtn.disabled = !SpeechRecognition;
+        sendBtnLabel.textContent = lang === "ja" ? "送信" : "Send";
+        sendBtnSpinner.style.display = "none";
+      }
+    }
+
+    /***********************
+     * EVENT LISTENERS
+     ***********************/
+    chatToggle.addEventListener("click", () => {
+      const isOpen = chatWidget.classList.contains("open");
+      if (isOpen) {
+        chatWidget.classList.remove("open");
+        chatToggle.classList.remove("open");
+      } else {
+        chatWidget.classList.add("open");
+        chatToggle.classList.add("open");
+        userInput.focus();
+      }
+    });
+
+    headerMinimizeBtn.addEventListener("click", () => {
+      chatWidget.classList.remove("open");
+      chatToggle.classList.remove("open");
+    });
+
+    headerInfoBtn.addEventListener("click", () => {
+      const lang = getLang();
+      addMessage("bot", strings[lang].howToUse);
+    });
+
+    sendBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      sendMessage();
+    });
+
+    userInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    micBtn.addEventListener("click", () => {
+      if (!recognition) return;
+      if (recognizing) {
+        stopVoiceInput();
+      } else {
+        startVoiceInput();
+      }
+    });
+
+    langSelect.addEventListener("change", () => {
+      applyLang();
+      const lang = getLang();
+      sendBtnLabel.textContent = lang === "ja" ? "送信" : "Send";
+    });
+
+    quickPrompts.addEventListener("click", (e) => {
+      const btn = e.target.closest(".quick-prompt-btn");
+      if (!btn) return;
+      const lang = getLang();
+      const prompt =
+        lang === "ja"
+          ? btn.getAttribute("data-prompt-ja")
+          : btn.getAttribute("data-prompt-en");
+      if (prompt) {
+        userInput.value = prompt;
+        sendMessage();
+      }
+    });
+
+    /***********************
+     * INIT
+     ***********************/
+    function init() {
+      applyLang();
+      sendBtnLabel.textContent = "Send";
+      if (history.length === 0) {
+        // initial welcome message
+        addMessage("bot", strings[getLang()].welcome);
+      } else {
+        renderHistory();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
