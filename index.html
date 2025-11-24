@@ -819,7 +819,7 @@
         error: "Error – please try again.",
         howToUse:
           "You can ask questions in English or Japanese. I use your private knowledge base behind the scenes.",
-        subtitle: "Answers from your internal documents.",
+        subtitle: "Answers from expert Experiences.",
       },
       ja: {
         welcome:
@@ -1030,14 +1030,14 @@
             "bot",
             "👋 こんにちは " +
               userName +
-              " さん。AIアシスタントです。ナレッジベースや資料について何でも聞いてください。"
+              " 私はサロニです。あなたのフレンドリーな衛星知識アシスタント。"
           );
         } else {
           addMessage(
             "bot",
             "👋 Hi " +
               userName +
-              "! I’m your AI assistant. Ask me anything about your documents or knowledge base."
+              "!  I’m Saloni. Your friendly Satellite Knowledge Assistant."
           );
         }
       }
@@ -1282,16 +1282,16 @@
           if (lang === "ja") {
             addMessage(
               "bot",
-              " いらっしゃいませ " +
+              " こんにちは " +
                 userName +
-                " 私はサロニです。あなたのフレンドリーな衛星知識アシスタント。衛星がどのように機能するか、宇宙システムを探索するか、通信プロトコルを学習するかに興味がある場合でも、単に新しいことを理解したい場合でも、私はあなたを案内するためにここにいます。何でも聞いてください。一緒に衛星知識の宇宙を探索しましょう"
+                " 私はサロニです。あなたのフレンドリーな衛星知識アシスタント。"
             );
           } else {
             addMessage(
               "bot",
               "👋 Welcome " +
                 userName +
-                "!  I’m Saloni. Your friendly Satellite Knowledge Assistant. Whether you’re curious about how satellites work, exploring space systems, learning communication protocols, or just want to understand something new; I’m here to guide you. Ask me anything. Let’s explore the universe of satellite knowledge together"
+                "!  I’m Saloni. Your friendly Satellite Knowledge Assistant."
             );
           }
         } else {
