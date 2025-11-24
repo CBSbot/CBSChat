@@ -823,7 +823,7 @@
         }
 
         const data = await res.json();
-        const reply = data.reply || "No reply field in response.";
+        const reply = data.output || "No reply field in response.";
         hideTypingIndicator();
         addMessage("bot", reply);
         speakText(reply);
