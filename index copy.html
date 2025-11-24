@@ -209,10 +209,6 @@
       font-size: 16px;
       padding: 4px;
     }
-    
-    .header-icon-btn:hover {
-        color: #e5e7eb;
-    }
 
     /* Messages Area */
     .chat-messages {
@@ -652,7 +648,7 @@
         <div>
           <div class="chat-title">SALONI</div>
           <div class="chat-subtitle" id="chat-subtitle">
-             Answers from real experiences.
+            Answers from real experiences.
           </div>
         </div>
       </div>
@@ -663,8 +659,6 @@
             <option value="ja">JA 🇯🇵</option>
           </select>
         </div>
-        <!-- New Restart Button -->
-        <button class="header-icon-btn" id="header-restart-btn" title="Restart Session">↻</button>
         <button class="header-icon-btn" id="header-info-btn" title="Info">ℹ️</button>
       </div>
     </div>
@@ -811,7 +805,6 @@
     let headerInfoBtn, quickPrompts, chatSubtitle;
     let sessionSetup, userNameInput, userInstituteInput, startSessionBtn, sessionError;
     let voiceToggleInput;
-    let headerRestartBtn;
 
     /***********************
      * LANGUAGE STRINGS
@@ -819,14 +812,14 @@
     const strings = {
       en: {
         welcome:
-          "👋 Hi! I’m SALONI. ",
+          "👋 Hi! I’m your AI assistant. Ask me anything about your documents or knowledge base.",
         placeholder: "Type your message…",
         sending: "Thinking…",
         online: "Online",
         error: "Error – please try again.",
         howToUse:
-          "You can ask questions in English or Japanese. I use our private knowledge base behind the scenes.",
-        subtitle: "Answers from expert Experiences",
+          "You can ask questions in English or Japanese. I use your private knowledge base behind the scenes.",
+        subtitle: "Answers from expert Experiences.",
       },
       ja: {
         welcome:
@@ -1159,7 +1152,6 @@
       sendBtnSpinner = document.getElementById("send-btn-spinner");
       micBtn = document.getElementById("mic-btn");
       headerInfoBtn = document.getElementById("header-info-btn");
-      headerRestartBtn = document.getElementById("header-restart-btn");
       quickPrompts = document.getElementById("quick-prompts");
       chatSubtitle = document.getElementById("chat-subtitle");
 
@@ -1175,19 +1167,6 @@
         headerInfoBtn.addEventListener("click", () => {
           const lang = getLang();
           addMessage("bot", strings[lang].howToUse);
-        });
-      }
-      
-      // RESTART BUTTON LOGIC
-      if (headerRestartBtn) {
-        headerRestartBtn.addEventListener("click", () => {
-            if (confirm("Restart session? This will clear your chat history and sign you out.")) {
-                localStorage.removeItem("kb_chat_session_id");
-                localStorage.removeItem(USER_NAME_KEY);
-                localStorage.removeItem(USER_INSTITUTE_KEY);
-                localStorage.removeItem(historyKey);
-                location.reload();
-            }
         });
       }
 
@@ -1303,16 +1282,16 @@
           if (lang === "ja") {
             addMessage(
               "bot",
-              "👋 こんにちは " +
+              " こんにちは " +
                 userName +
-                " さん。AIアシスタントです。ナレッジベースや資料について何でも聞いてください。"
+                " 私はサロニです。あなたのフレンドリーな衛星知識アシスタント。"
             );
           } else {
             addMessage(
               "bot",
-              "👋 Hi " +
+              "👋 Welcome " +
                 userName +
-                "! I’m your AI assistant. Ask me anything about your documents or knowledge base."
+                "!  I’m Saloni. Your friendly Satellite Knowledge Assistant."
             );
           }
         } else {
