@@ -1223,14 +1223,27 @@
         });
       }
 
+    //   if (userInput) {
+    //     userInput.addEventListener("keydown", (e) => {
+    //       if (e.key === "Enter" && !e.shiftKey) {
+    //         e.preventDefault();
+    //         sendMessage();
+    //       }
+    //     });
+    //   }
       if (userInput) {
-        userInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-          }
-        });
-      }
+          userInput.addEventListener("keydown", (e) => {
+             if (e.key === "Enter" && e.shiftKey) {
+             // SHIFT + ENTER → Send message
+                 e.preventDefault();
+                 sendMessage();
+             } else if (e.key === "Enter" ) {
+                // ENTER → DO NOTHING (allow new line)
+                 e.preventDefault(); // ignore Enter completely
+                //  userInput.value += "\n"; // optional: allow newline
+            }
+          }); 
+       }
 
       if (micBtn) {
         micBtn.addEventListener("click", () => {
