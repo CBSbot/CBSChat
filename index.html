@@ -680,7 +680,7 @@
       <div class="session-setup-inner">
           <div class="session-setup-title">Start your session</div>
           <div class="session-setup-desc">
-            Please enter your <strong>Name</strong> and <strong>Institute</strong> to begin.
+            Please enter your <strong>Name</strong>, <strong>Institute</strong> and <strong>Country</strong> to begin.
           </div>
           <div class="session-setup-row">
             <input
@@ -696,6 +696,13 @@
               type="text"
               placeholder="Your institute / organization"
               autocomplete="organization"
+            />
+            <input
+              id="user-country-input"
+              class="session-input"
+              type="text"
+              placeholder="Your country"
+              autocomplete="country-name"
             />
           </div>
           <button id="start-session-btn" class="session-start-btn">
@@ -797,9 +804,11 @@
     const historyKey = "kb_chat_history_" + sessionId;
     const USER_NAME_KEY = "kb_chat_user_name";
     const USER_INSTITUTE_KEY = "kb_chat_user_institute";
+    const USER_COUNTRY_KEY = "kb_chat_user_country";
 
     let userName = localStorage.getItem(USER_NAME_KEY) || "";
     let userInstitute = localStorage.getItem(USER_INSTITUTE_KEY) || "";
+    let userCountry = localStorage.getItem(USER_COUNTRY_KEY) || "";
 
     function loadHistory() {
       try {
@@ -821,7 +830,7 @@
     let chatWidget, messagesInner, messagesScroll, statusText, sessionLabel;
     let langSelect, userInput, sendBtn, sendBtnLabel, sendBtnSpinner, micBtn;
     let headerInfoBtn, quickPrompts, chatSubtitle;
-    let sessionSetup, userNameInput, userInstituteInput, startSessionBtn, sessionError;
+    let sessionSetup, userNameInput, userInstituteInput, userCountryInput, startSessionBtn, sessionError;
     let voiceToggleInput;
     let headerRestartBtn;
 
@@ -1022,22 +1031,25 @@
     }
 
     function hasProfile() {
-      return !!(userName && userInstitute);
+      return !!(userName && userInstitute && userCountry);
     }
 
     function handleStartSession() {
       const name = (userNameInput?.value || "").trim();
       const inst = (userInstituteInput?.value || "").trim();
+      const country = (userCountryInput?.value || "").trim();
 
-      if (!name || !inst) {
-        if (sessionError) sessionError.textContent = "Please fill in both Name and Institute.";
+      if (!name || !inst || !country) {
+        if (sessionError) sessionError.textContent = "Please fill in Name, Institute and Country.";
         return;
       }
 
       userName = name;
       userInstitute = inst;
+      userCountry = country;
       localStorage.setItem(USER_NAME_KEY, userName);
       localStorage.setItem(USER_INSTITUTE_KEY, userInstitute);
+      localStorage.setItem(USER_COUNTRY_KEY, userCountry);
 
       updateSessionLabel();
       hideSessionSetup();
@@ -1100,6 +1112,7 @@
           sessionId: sessionId,
           userName: userName,
           institute: userInstitute,
+          country: userCountry,
         };
 
         const headers = {
@@ -1178,6 +1191,7 @@
       sessionSetup = document.getElementById("session-setup");
       userNameInput = document.getElementById("user-name-input");
       userInstituteInput = document.getElementById("user-institute-input");
+      userCountryInput = document.getElementById("user-country-input");
       startSessionBtn = document.getElementById("start-session-btn");
       sessionError = document.getElementById("session-error");
       voiceToggleInput = document.getElementById("voice-toggle-input");
@@ -1197,6 +1211,7 @@
                 localStorage.removeItem("kb_chat_session_id");
                 localStorage.removeItem(USER_NAME_KEY);
                 localStorage.removeItem(USER_INSTITUTE_KEY);
+                localStorage.removeItem(USER_COUNTRY_KEY);
                 localStorage.removeItem(historyKey);
                 location.reload();
             }
@@ -1221,6 +1236,15 @@
 
       if (userInstituteInput) {
         userInstituteInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleStartSession();
+          }
+        });
+      }
+
+      if (userCountryInput) {
+        userCountryInput.addEventListener("keydown", (e) => {
           if (e.key === "Enter") {
             e.preventDefault();
             handleStartSession();
